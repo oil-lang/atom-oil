@@ -1,0 +1,263 @@
+name: 'Oil syntax highlighting'
+scopeName: 'source.oil'
+fileTypes: ['oil']
+foldingStartMarker: '(?x)^\n\t\t\t#   Yes *+      Open  (         Blank |Comments                                        | (No Paren | String) | String                                                        | (Nested Parens             )  )*+\n\t\t\t(?> \\g<yesS>*+  \\[    (?<yesS>  (?!.) |//.*+|/\\*((?!\\*/).)++(\\*/|$)|(^)((?!/\\*).)*(\\*/)| (?<noS>[^\\[\\]\'"/]) | (?<str> \'(\\\\\'|[^\'])*+\' | "(\\\\"|[^"])*+" | /(\\\\/|[^/])*+/) | (?<squar> \\[ \\g<yesS>*+ \\] )  )*+\n\t\t\t|   \\g<yesR>*+  \\(    (?<yesR>  (?!.) |//.*+|/\\*((?!\\*/).)++(\\*/|$)|(^)((?!/\\*).)*(\\*/)| (?<noR>[^\\(\\)\'"/]) | \\g<str>                                                       | (?<round> \\( \\g<yesR>*+ \\) )  )*+\n\t\t\t|   \\g<yesC>*+  \\{    (?<yesC>  (?!.) |//.*+|/\\*((?!\\*/).)++(\\*/|$)|(^)((?!/\\*).)*(\\*/)| (?<noC>[^\\{\\}\'"/]) | \\g<str>                                                       | (?<curly> \\{ \\g<yesC>*+ \\} )  )*+\n\t\t)$'
+foldingStopMarker: '(?x)^\n\t\t\t#                     (         Blank |Comments                                        | (No Paren | String) | String                                                        | (Nested Parens             )  )*+  Close  Yes *+\n\t\t\t(?>                   (?<yesS>  (?!.) |//.*+|/\\*((?!\\*/).)++(\\*/|$)|(^)((?!/\\*).)*(\\*/)| (?<noS>[^\\[\\]\'"/]) | (?<str> \'(\\\\\'|[^\'])*+\' | "(\\\\"|[^"])*+" | /(\\\\/|[^/])*+/) | (?<squar> \\[ \\g<yesS>*+ \\] )  )*+  \\]     \\g<yesS>*+\n\t\t\t|                     (?<yesR>  (?!.) |//.*+|/\\*((?!\\*/).)++(\\*/|$)|(^)((?!/\\*).)*(\\*/)| (?<noR>[^\\(\\)\'"/]) | \\g<str>                                                       | (?<round> \\( \\g<yesR>*+ \\) )  )*+  \\)     \\g<yesR>*+\n\t\t\t|                     (?<yesC>  (?!.) |//.*+|/\\*((?!\\*/).)++(\\*/|$)|(^)((?!/\\*).)*(\\*/)| (?<noC>[^\\{\\}\'"/]) | \\g<str>                                                       | (?<curly> \\{ \\g<yesC>*+ \\} )  )*+  \\}     \\g<yesC>*+\n\t\t)$'
+patterns: [
+    {
+        include: '#everything'
+    }
+]
+repository:
+    everything:
+        patterns: [
+            {
+                include: '#comments'
+            }
+            {
+                include: '#core'
+            }
+            {
+                include: '#component-definition'
+            }
+            {
+                include: '#view-definition'
+            }
+        ]
+    core:
+        patterns: [
+            {
+                include: '#literal-number'
+            }
+            {
+                include: '#literal-string'
+            }
+            {
+                include: '#literal-keywords'
+            }
+        ]
+    'component-definition':
+        begin: '\\b(component)(?:\\s+((?i)[_$a-z][_$a-z0-9]*))?'
+        beginCaptures:
+            '1':
+                name: 'keyword.control.def.oil'
+            '2':
+                name: 'entity.name.function.$1.oil'
+        end: '(?<=})'
+        name: 'meta.$1'
+        patterns: [
+            {
+                begin: '\\G'
+                end: '(?<=\\])'
+                patterns: [
+                    {
+                        begin: '\\G(?!\\[)'
+                        comment: 'function name'
+                        end: '(?=\\[)'
+                        patterns: [
+                            {
+                                include: '#comments'
+                            }
+                            {
+                                match: '(?i)[_$a-z][_$a-z0-9]*'
+                                name: 'entity.name.function.$0.oil'
+                            }
+                        ]
+                    }
+                    {
+                        begin: '\\['
+                        beginCaptures:
+                            '0':
+                                name: 'punctuation.definition.parameters.begin.function.oil'
+                        contentName: 'meta.function.parameters'
+                        end: '\\]'
+                        endCaptures:
+                            '0':
+                                name: 'punctuation.definition.parameters.end.function.oil'
+                        name: 'meta.function.parameters'
+                        patterns: [
+                            {
+                                include: '#comments'
+                            }
+                            {
+                                match: '\\b(?i)[_$a-z][_$a-z0-9]*\\b'
+                                name: 'variable.parameter.function.oil'
+                            }
+                            {
+                                match: ','
+                                name: 'punctuation.separator.parameters.function.oil'
+                            }
+                        ]
+                    }
+                ]
+            }
+            {
+                include: '#comments'
+            }
+            {
+                begin: '(=)(?:\\s*)({)'
+                beginCaptures:
+                    '1':
+                        name: 'punctuation.equal.oil'
+                    '2':
+                        name: 'punctuation.definition.function.begin.oil'
+                contentName: 'meta.function.body'
+                end: '}'
+                endCaptures:
+                    '0':
+                        name: 'punctuation.definition.function.end.oil'
+                patterns: [
+                    {
+                        include: '#core'
+                    }
+                ]
+            }
+            {
+                begin: '(=)(?:\\s*)'
+                beginCaptures:
+                    '1':
+                        name: 'punctuation.definition.function.begin.oil'
+                contentName: 'meta.function.body'
+                end: ';'
+                endCaptures:
+                    '0':
+                        name: 'punctuation.definition.function.end.oil'
+                patterns: [
+                    {
+                        include: '#core'
+                    }
+                ]
+            }
+        ]
+    'view-definition':
+        begin: '\\b(view)(?:\\s+((?i)[_$a-z][_$a-z0-9]*))?'
+        patterns: [
+
+        ]
+    'literal-number':
+        patterns: [
+            {
+                match: '(?i)(?:\\B[-+]|\\b)0x[0-9a-f]*\\.(\\B|\\b[0-9]+)'
+                name: 'invalid.illegal.numeric.hex.oil'
+            }
+            {
+                match: '(?:\\B[-+]|\\b)0[0-9]+\\.(\\B|\\b[0-9]+)'
+                name: 'invalid.illegal.numeric.octal.oil'
+            }
+            {
+                match: '(?xi)(?:\\B[-+])?(?:\n\t\t\t\t\t \\b0x[0-9a-f]* # HEX\n\t\t\t\t\t|(          \\B\\.[0-9]+   # EG:    .999\n\t\t\t\t\t  | \\b[0-9]+ (\\.[0-9]*)? # EG: 999.999 or 999. or 999 \n\t\t\t\t\t )(e[-+]?[0-9]+)?        # EG: e+123 or E-123\n\t\t\t\t\t)'
+                name: 'constant.numeric.oil'
+            }
+            {
+                match: '(?:\\B[-+]|\\b)(Infinity)\\b'
+                name: 'constant.language.oil'
+            }
+        ]
+    'literal-string':
+        patterns: [
+            {
+                begin: '\''
+                beginCaptures:
+                    '0':
+                        name: 'punctuation.definition.string.begin.oil'
+                end: '(?i)\'|(?=</\\s*script\\s*>\\s*\\n)|(?<=[^\\\\]\\n)'
+                endCaptures:
+                    '0':
+                        name: 'punctuation.definition.string.end.oil'
+                name: 'string.quoted.single.oil'
+                patterns: [
+                    {
+                        include: '#string-single-innards'
+                    }
+                ]
+            }
+            {
+                begin: '"'
+                beginCaptures:
+                    '0':
+                        name: 'punctuation.definition.string.begin.oil'
+                end: '(?i)"|(?=</\\s*script\\s*>\\s*\\n)|(?<=[^\\\\]\\n)'
+                endCaptures:
+                    '0':
+                        name: 'punctuation.definition.string.end.oil'
+                name: 'string.quoted.double.oil'
+                patterns: [
+                    {
+                        include: '#string-double-innards'
+                    }
+                ]
+            }
+        ]
+    'literal-keywords':
+        patterns: [
+            # {
+            #     captures:
+            #         '1':
+            #             name: 'keyword.control.oil'
+            #         '2':
+            #             name: 'entity.name.type.class.oil'
+            #     match: '(component)\\s+(\\w+(?:\\.\\w*)?)'
+            #     name: 'meta.class.instance.constructor'
+            # }
+            {
+                match: '\\b(let|obs)\\b'
+                name: 'storage.modifier.oil'
+            }
+            {
+                match: '\\b(const|export)\\b'
+                name: 'storage.modifier.oil'
+            }
+            {
+                match: '\\b(@if|import|from)\\b'
+                name: 'keyword.control.oil'
+            }
+            {
+                match: '\\btrue\\b'
+                name: 'constant.language.boolean.true.oil'
+            }
+            {
+                match: '\\bfalse\\b'
+                name: 'constant.language.boolean.false.oil'
+            }
+            {
+
+            }
+        ]
+    'string-double-innards':
+        patterns: [
+            {
+                match: '\\\\(x\\h{2}|[0-2][0-7]{,2}|3[0-6][0-7]|37[0-7]?|[4-7][0-7]?|.)'
+                name: 'constant.character.escape.oil'
+            }
+            {
+                match: '\\\\\\n'
+                name: 'constant.character.escape.newline.oil'
+            }
+            {
+                match: '\\n'
+                name: 'invalid.illegal.newline.oil'
+            }
+            {
+                match: '(?i)</\\s*script\\s*>'
+                name: 'invalid.deprecated.inconsistent.oil'
+            }
+        ]
+    'string-single-innards':
+        patterns: [
+            {
+                match: '\\\\(x\\h{2}|[0-2][0-7]{,2}|3[0-6][0-7]?|37[0-7]?|[4-7][0-7]?|.)'
+                name: 'constant.character.escape.oil'
+            }
+            {
+                match: '\\\\\\n'
+                name: 'constant.character.escape.newline.oil'
+            }
+            {
+                match: '\\n'
+                name: 'invalid.illegal.newline.oil'
+            }
+            {
+                match: '(?i)</\\s*script\\s*>'
+                name: 'invalid.deprecated.inconsistent.oil'
+            }
+        ]

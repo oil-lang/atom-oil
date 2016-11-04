@@ -1,0 +1,15 @@
+{
+  "name": "language-oil",
+  "version": "0.1.0",
+  "description": "Syntax highlighting for the oil language.",
+  "keywords": [
+      "oil"
+  ],
+  "repository": "https://github.com/oil-lang/language-oil",
+  "license": "MIT",
+  "engines": {
+    "atom": ">=1.0.0 <2.0.0"
+  },
+  "dependencies": {
+  }
+}
