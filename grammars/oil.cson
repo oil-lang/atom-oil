@@ -21,6 +21,9 @@ repository:
                 include: '#component-definition'
             }
             {
+                include: '#component-definition-short'
+            }
+            {
                 include: '#view-definition'
             }
         ]
@@ -254,73 +257,73 @@ repository:
                 ]
             }
         ]
-    'component-definition':
+    'component-definition-arg':
+        begin: '\\G'
+        end: '(?<=\\])'
+        patterns: [
+            {
+                begin: '\\G(?!\\[)'
+                comment: 'component name'
+                end: '(?=\\[)'
+                patterns: [
+                    {
+                        include: '#comments'
+                    }
+                    {
+                        match: '(?i)[_$a-z][_$a-z0-9]*'
+                        name: 'entity.name.function.$0.oil'
+                    }
+                ]
+            }
+            {
+                begin: '\\['
+                beginCaptures:
+                    '0':
+                        name: 'punctuation.definition.parameters.begin.function.oil'
+                contentName: 'meta.function.parameters'
+                end: '\\]'
+                endCaptures:
+                    '0':
+                        name: 'punctuation.definition.parameters.end.function.oil'
+                name: 'meta.function.parameters'
+                patterns: [
+                    {
+                        include: '#comments'
+                    }
+                    {
+                        match: '\\b(?i)[_$a-z][_$a-z0-9]*\\b'
+                        name: 'variable.parameter.function.oil'
+                    }
+                    {
+                        match: ','
+                        name: 'punctuation.separator.parameters.function.oil'
+                    }
+                ]
+            }
+        ]
+    'component-definition-short':
         begin: '\\b(component)(?:\\s+((?i)[_$a-z][_$a-z0-9]*))?'
         beginCaptures:
             '1':
                 name: 'keyword.control.def.oil'
             '2':
                 name: 'entity.name.function.$1.oil'
-        end: '(?<=})'
+        end: '(?<=;)'
         name: 'meta.$1'
         patterns: [
             {
-                begin: '\\G'
-                end: '(?<=\\])'
-                patterns: [
-                    {
-                        begin: '\\G(?!\\[)'
-                        comment: 'component name'
-                        end: '(?=\\[)'
-                        patterns: [
-                            {
-                                include: '#comments'
-                            }
-                            {
-                                match: '(?i)[_$a-z][_$a-z0-9]*'
-                                name: 'entity.name.function.$0.oil'
-                            }
-                        ]
-                    }
-                    {
-                        begin: '\\['
-                        beginCaptures:
-                            '0':
-                                name: 'punctuation.definition.parameters.begin.function.oil'
-                        contentName: 'meta.function.parameters'
-                        end: '\\]'
-                        endCaptures:
-                            '0':
-                                name: 'punctuation.definition.parameters.end.function.oil'
-                        name: 'meta.function.parameters'
-                        patterns: [
-                            {
-                                include: '#comments'
-                            }
-                            {
-                                match: '\\b(?i)[_$a-z][_$a-z0-9]*\\b'
-                                name: 'variable.parameter.function.oil'
-                            }
-                            {
-                                match: ','
-                                name: 'punctuation.separator.parameters.function.oil'
-                            }
-                        ]
-                    }
-                ]
+                include: '#component-definition-arg'
             }
             {
                 include: '#comments'
             }
             {
-                begin: '(=)(?:\\s*)({)'
+                begin: '='
                 beginCaptures:
-                    '1':
-                        name: 'punctuation.equal.oil'
-                    '2':
+                    '0':
                         name: 'punctuation.definition.function.begin.oil'
                 contentName: 'meta.function.body'
-                end: '}'
+                end: ';'
                 endCaptures:
                     '0':
                         name: 'punctuation.definition.function.end.oil'
@@ -333,13 +336,30 @@ repository:
                     }
                 ]
             }
+        ]
+    'component-definition':
+        begin: '\\b(component)(?:\\s+((?i)[_$a-z][_$a-z0-9]*))?'
+        beginCaptures:
+            '1':
+                name: 'keyword.control.def.oil'
+            '2':
+                name: 'entity.name.function.$1.oil'
+        end: '(?<=})'
+        name: 'meta.$1'
+        patterns: [
             {
-                begin: '(=)(?:\\s*)'
+                include: '#component-definition-arg'
+            }
+            {
+                include: '#comments'
+            }
+            {
+                begin: '{'
                 beginCaptures:
-                    '1':
+                    '0':
                         name: 'punctuation.definition.function.begin.oil'
                 contentName: 'meta.function.body'
-                end: ';'
+                end: '}'
                 endCaptures:
                     '0':
                         name: 'punctuation.definition.function.end.oil'
@@ -412,33 +432,12 @@ repository:
                 include: '#comments'
             }
             {
-                begin: '(=)(?:\\s*)({)'
+                begin: '{'
                 beginCaptures:
-                    '1':
-                        name: 'punctuation.equal.oil'
-                    '2':
+                    '0':
                         name: 'punctuation.definition.function.begin.oil'
                 contentName: 'meta.function.body'
                 end: '}'
-                endCaptures:
-                    '0':
-                        name: 'punctuation.definition.function.end.oil'
-                patterns: [
-                    {
-                        include: '#core'
-                    }
-                    {
-                        include: '#block-tag'
-                    }
-                ]
-            }
-            {
-                begin: '(=)(?:\\s*)'
-                beginCaptures:
-                    '1':
-                        name: 'punctuation.definition.function.begin.oil'
-                contentName: 'meta.function.body'
-                end: ';'
                 endCaptures:
                     '0':
                         name: 'punctuation.definition.function.end.oil'
